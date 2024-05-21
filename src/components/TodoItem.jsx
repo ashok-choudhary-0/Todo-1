@@ -2,19 +2,8 @@ import React, { useState } from 'react';
 import { MdEdit } from 'react-icons/md';
 import { MdDelete } from 'react-icons/md';
 
-const TodoItem = ({ todo, setAllTodos, allTodos,handleEditTodo}) => {
+const TodoItem = ({ todo, handleEditTodo, handleDeleteTodo }) => {
   const [showCompletedBadge, setShowCompletedBadge] = useState(false);
-
-  const handleDeleteTodo = (event) => {
-    const filter = allTodos?.filter((singleTodo) => {
-      if (singleTodo.id !== todo.id) {
-        return singleTodo;
-      }
-    });
-    setAllTodos(filter);
-  };
-
-
 
   return (
     <div className="flex items-center relative gap-x-2">
@@ -32,8 +21,12 @@ const TodoItem = ({ todo, setAllTodos, allTodos,handleEditTodo}) => {
       </p>
       {!showCompletedBadge && (
         <div className="flex gap-2 cursor-pointer">
-          <MdEdit onClick={()=>handleEditTodo(todo)} />
-          <MdDelete onClick={handleDeleteTodo} />
+          <MdEdit onClick={() => handleEditTodo(todo)} />
+          <MdDelete
+            onClick={() => {
+              handleDeleteTodo(todo?.id);
+            }}
+          />
         </div>
       )}
     </div>

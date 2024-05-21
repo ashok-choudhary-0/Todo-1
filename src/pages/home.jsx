@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import TodoItem from '../components/TodoItem';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 const Home = () => {
   const [allTodos, setAllTodos] = useState([]);
   const [todoDetails, setTodoDetails] = useState({ task: '', id: '' });
   const [showError, setShowError] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState(null);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [deletedTodoId, setDeletedTodoId] = useState(null);
 
   const handleChange = (event) => {
     setTodoDetails({
-      id: new Date().getMilliseconds(),
       task: event.target.value,
     });
     setShowError(false);
@@ -39,7 +41,10 @@ const Home = () => {
       });
       setSelectedTodo(null);
     } else {
-      setAllTodos((prev) => [...prev, todoDetails]);
+      setAllTodos((prev) => [
+        ...prev,
+        { ...todoDetails, id: Math.random() * 100000000 },
+      ]);
       setTodoDetails({ task: '' });
       setShowError(false);
     }
@@ -52,6 +57,25 @@ const Home = () => {
     });
   };
 
+  const confirmationModalCancelButton = () => {
+    setShowConfirmationModal(false);
+    setDeletedTodoId(null);
+  };
+
+  const handleDeleteTodo = (id) => {
+    setShowConfirmationModal(true);
+    setDeletedTodoId(id);
+  };
+  const confirmationModalDeleteButton = () => {
+    const filter = allTodos?.filter((singleTodo) => {
+      if (singleTodo.id !== deletedTodoId) {
+        return singleTodo;
+      }
+    });
+    setAllTodos(filter);
+    setShowConfirmationModal(false);
+  };
+
   return (
     <>
       <div className="w-3/4 border border-green-900 rounded-md ml-auto mr-auto p-4 pb-10 mt-10">
@@ -61,11 +85,10 @@ const Home = () => {
         {allTodos?.map((todo) => {
           return (
             <TodoItem
-              allTodos={allTodos}
-              setAllTodos={setAllTodos}
               key={todo.id}
               todo={todo}
               handleEditTodo={handleEditTodo}
+              handleDeleteTodo={handleDeleteTodo}
             />
           );
         })}
@@ -91,6 +114,12 @@ const Home = () => {
         </div>
         {showError === true && (
           <p className="text-red-600 mb-2">Task can't be empty</p>
+        )}
+        {showConfirmationModal && (
+          <ConfirmationModal
+            confirmationModalCancelButton={confirmationModalCancelButton}
+            confirmationModalDeleteButton={confirmationModalDeleteButton}
+          />
         )}
       </div>
     </>
